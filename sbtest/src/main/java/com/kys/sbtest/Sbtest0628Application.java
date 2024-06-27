@@ -56,7 +56,7 @@ public class Sbtest0628Application {
                         break;
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                System.out.println("!!! 잘못된 입력입니다. !!!");
             }
         }
     }
