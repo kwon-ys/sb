@@ -73,11 +73,23 @@ public class ConsoleApplication {
         System.out.println("--------");
         System.out.print("연락처 이름 :");
         String name = input.nextLine();
+        if (name.isEmpty()) {
+            System.out.println("이름을 적으세요");
+            return;
+        }
         EPhoneGroup group = this.getGroupFromScanner(input, "");
         System.out.print("전화번호 :");
         String phone = input.nextLine();
+        if (phone.isEmpty()) {
+            System.out.println("전화번호를 적으세요");
+            return;
+        }
         System.out.print("이메일 :");
         String email = input.nextLine();
+        if (email.isEmpty()) {
+            System.out.println("이메일을 적으세요");
+            return;
+        }
 
         if (this.phoneBookService.insert(name, group, phone, email)) {
             this.phoneBookService.saveData();
@@ -93,11 +105,20 @@ public class ConsoleApplication {
         }
         System.out.print("연락처 이름 :");
         String name = input.nextLine();
+        if (name.isEmpty()) {
+            name = result.getEmail(); // 기존 이름 유지
+        }
         EPhoneGroup group = this.getGroupFromScanner(input, "");
         System.out.print("전화번호 :");
         String phone = input.nextLine();
+        if (phone.isEmpty()) {
+            phone = result.getEmail(); // 기존 전화번호 유지
+        }
         System.out.print("이메일 :");
         String email = input.nextLine();
+        if (email.isEmpty()) {
+            email = result.getEmail(); // 기존 이메일 유지
+        }
         IPhoneBook update = PhoneBook.builder()
                 .id(result.getId()).name(name)
                 .group(group)
