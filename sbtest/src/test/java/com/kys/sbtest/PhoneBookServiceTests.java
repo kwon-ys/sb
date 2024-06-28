@@ -21,13 +21,13 @@ public class PhoneBookServiceTests {
         assertThat(textFile.exists()).isEqualTo(false);
 
         assertThat(jsonService.size()).isEqualTo(0);
-        IPhoneBook add1 = PhoneBook.builder().id(1L).name("add1")
+        IPhoneBook add1 = PhoneBook.builder().id(1L).name("fr1222")
                         .group(EPhoneGroup.Friends).phoneNumber("010-0000-0000")
                         .email("add1@gmail.com").build();
-        IPhoneBook add2 = PhoneBook.builder().id(2L).name("add2")
+        IPhoneBook add2 = PhoneBook.builder().id(2L).name("fr2222")
                 .group(EPhoneGroup.Jobs).phoneNumber("010-1111-0000")
                 .email("add2@gmail.com").build();
-        IPhoneBook add3 = PhoneBook.builder().id(3L).name("add3")
+        IPhoneBook add3 = PhoneBook.builder().id(3L).name("hb3222")
                 .group(EPhoneGroup.Hobbies).phoneNumber("010-1111-2222")
                 .email("add3@gmail.com").build();
 
@@ -45,13 +45,13 @@ public class PhoneBookServiceTests {
         assertThat(textService.size()).isEqualTo(3);
         // find test
         IPhoneBook find = jsonService.findById(2L);
-        assertThat(find.getName()).isEqualTo("add2");
+        assertThat(find.getName()).isEqualTo("fr2222");
         assertThat(find.getGroup()).isEqualTo(EPhoneGroup.Jobs);
         assertThat(find.getPhoneNumber()).isEqualTo("010-1111-0000");
         assertThat(find.getEmail()).isEqualTo("add2@gmail.com");
 
         IPhoneBook find2 = textService.findById(2L);
-        assertThat(find2.getName()).isEqualTo("add2");
+        assertThat(find2.getName()).isEqualTo("fr2222");
         assertThat(find2.getGroup()).isEqualTo(EPhoneGroup.Jobs);
         assertThat(find2.getPhoneNumber()).isEqualTo("010-1111-0000");
         assertThat(find2.getEmail()).isEqualTo("add2@gmail.com");
@@ -64,27 +64,27 @@ public class PhoneBookServiceTests {
         assertThat(textService.remove(2L)).isEqualTo(true);
         assertThat(textService.size()).isEqualTo(2);
         // getListFromName test
-        assertThat(jsonService.getListFromName("add").size()).isEqualTo(2);
-        assertThat(textService.getListFromName("add").size()).isEqualTo(2);
+        assertThat(jsonService.getListFromName("fr").size()).isEqualTo(1);
+        assertThat(textService.getListFromName("222").size()).isEqualTo(2);
 
         // insert fields test
-        jsonService.insert("add4", EPhoneGroup.Friends, "010-3222-3999", "add4@naver.com");
+        jsonService.insert("fr4", EPhoneGroup.Friends, "010-2222-9999", "add4@naver.com");
         assertThat(jsonService.size()).isEqualTo(3);
         assertThat(jsonService.getMaxId()).isEqualTo(5L);
-        textService.insert("add4", EPhoneGroup.Friends, "010-3222-3999", "add4@naver.com");
+        textService.insert("fr4", EPhoneGroup.Friends, "010-2222-9999", "add4@naver.com");
         assertThat(textService.size()).isEqualTo(3);
         assertThat(textService.getMaxId()).isEqualTo(5L);
         // getListFromName test
-        assertThat(jsonService.getListFromGroup(EPhoneGroup.Friends).size()).isEqualTo(2);
+        assertThat(jsonService.getListFromGroup(EPhoneGroup.Schools).size()).isEqualTo(0);
         assertThat(textService.getListFromGroup(EPhoneGroup.Friends).size()).isEqualTo(2);
 
         // save file test
         assertThat(jsonService.saveData()).isEqualTo(true);
         assertThat(textService.saveData()).isEqualTo(true);
         assertThat(jsonFile.exists()).isEqualTo(true);
-        assertThat(jsonFile.length()).isEqualTo(305L);
+        assertThat(jsonFile.length()).isEqualTo(308L);
         assertThat(textFile.exists()).isEqualTo(true);
-        assertThat(textFile.length()).isEqualTo(132L);
+        assertThat(textFile.length()).isEqualTo(135L);
 
         // load file test;
         jsonService.getAllList().clear();
