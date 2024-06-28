@@ -32,63 +32,73 @@ public class ConsoleApplication {
     }
 
     private EPhoneGroup getGroupFromScanner(Scanner input, String title) {
-        boolean doWhile = false;
-        EPhoneGroup eGroup = EPhoneGroup.Friends;
-        do {
-            System.out.print(title + "연락처 그룹{Friends(1),Families(2),Schools(3),Jobs(4),Hobbies(5)} :");
-            String group = input.nextLine();
+        while (true) {
+            System.out.print(title + "연락처 그룹 선택 (Friends(1), Families(2), Schools(3), Jobs(4), Hobbies(5)) : ");
+            String group = input.nextLine().trim();
+
+            if (group.isEmpty()) {
+                return null; // 입력이 없으면 null 반환하여 이전 값 유지
+            }
+
             switch (group) {
                 case "1":
-                    eGroup = EPhoneGroup.Friends;
-                    doWhile = false;
-                    break;
+                    return EPhoneGroup.Friends;
                 case "2":
-                    eGroup = EPhoneGroup.valueOf("Families");
-                    doWhile = false;
-                    break;
+                    return EPhoneGroup.Families;
                 case "3":
-                    eGroup = EPhoneGroup.Schools;
-                    doWhile = false;
-                    break;
+                    return EPhoneGroup.Schools;
                 case "4":
-                    eGroup = EPhoneGroup.Jobs;
-                    doWhile = false;
-                    break;
+                    return EPhoneGroup.Jobs;
                 case "5":
-                    eGroup = EPhoneGroup.Hobbies;
-                    doWhile = false;
-                    break;
+                    return EPhoneGroup.Hobbies;
                 default:
-                    doWhile = true;
-                    System.out.println("Friends(1),Families(2),Schools(3),Jobs(4),Hobbies(5) 1~5사이에 입력");
+                    System.out.println("Friends(1), Families(2), Schools(3), Jobs(4), Hobbies(5) 중에서 입력해주세요.");
                     break;
             }
-        } while (doWhile);
-        return eGroup;
+        }
     }
 
     public void insert(Scanner input) throws Exception {
         System.out.println("--------");
         System.out.println("연락처 생성");
         System.out.println("--------");
-        System.out.print("연락처 이름 :");
-        String name = input.nextLine();
-        if (name.isEmpty()) {
+
+        String name;
+        while (true) {
+            System.out.print("연락처 이름 : ");
+            name = input.nextLine();
+            if (!name.isEmpty()) {
+                break; // 이름이 비어있지 않으면 종료
+            }
             System.out.println("이름을 적으세요");
-            return;
         }
-        EPhoneGroup group = this.getGroupFromScanner(input, "");
-        System.out.print("전화번호 :");
-        String phone = input.nextLine();
-        if (phone.isEmpty()) {
+
+        EPhoneGroup group = null;
+        while (group == null) {
+            group = this.getGroupFromScanner(input, "");
+            if (group == null) {
+                System.out.println("연락처 그룹을 선택하세요.");
+            }
+        }
+
+        String phone;
+        while (true) {
+            System.out.print("전화번호 : ");
+            phone = input.nextLine();
+            if (!phone.isEmpty()) {
+                break; // 전화번호가 비어있지 않으면 종료
+            }
             System.out.println("전화번호를 적으세요");
-            return;
         }
-        System.out.print("이메일 :");
-        String email = input.nextLine();
-        if (email.isEmpty()) {
+
+        String email;
+        while (true) {
+            System.out.print("이메일 : ");
+            email = input.nextLine();
+            if (!email.isEmpty()) {
+                break; // 이메일이 비어있지 않으면 종료
+            }
             System.out.println("이메일을 적으세요");
-            return;
         }
 
         if (this.phoneBookService.insert(name, group, phone, email)) {
@@ -97,28 +107,37 @@ public class ConsoleApplication {
         }
     }
 
+
     public void update(Scanner input) throws Exception {
         IPhoneBook result = getFindIdConsole(input, "수정할");
         if (result == null) {
             System.out.println("에러: ID 데이터 가 존재하지 않습니다.");
             return;
         }
+
         System.out.print("연락처 이름 :");
         String name = input.nextLine();
         if (name.isEmpty()) {
-            name = result.getEmail(); // 기존 이름 유지
+            name = result.getName(); // 기존 이름 유지
         }
+
         EPhoneGroup group = this.getGroupFromScanner(input, "");
+        if (group == null) {
+            group = result.getGroup(); // 이전 그룹 유지
+        }
+
         System.out.print("전화번호 :");
         String phone = input.nextLine();
         if (phone.isEmpty()) {
-            phone = result.getEmail(); // 기존 전화번호 유지
+            phone = result.getPhoneNumber(); // 기존 전화번호 유지
         }
+
         System.out.print("이메일 :");
         String email = input.nextLine();
         if (email.isEmpty()) {
             email = result.getEmail(); // 기존 이메일 유지
         }
+
         IPhoneBook update = PhoneBook.builder()
                 .id(result.getId()).name(name)
                 .group(group)
@@ -165,33 +184,77 @@ public class ConsoleApplication {
     }
 
     public void searchByName(Scanner input) {
-        System.out.print("찾을 이름 :");
-        String name = input.nextLine();
+        while (true) {
+            System.out.print("찾을 이름 :");
+            String findName = input.nextLine();
+            if (findName.isEmpty()) {
+                System.out.println("이름을 입력하세요");
+                continue; // 이름이 비어 있으면 다시 입력 받기
+            }
 
-        List<IPhoneBook> list = this.phoneBookService.getListFromName(name);
-        this.printList(list);
+            List<IPhoneBook> list = this.phoneBookService.getListFromName(findName);
+            if (list.isEmpty()) {
+                System.out.println("저장된 이름이 없습니다.");
+                return; // 저장된 값이 아닌 경우
+            }
+            this.printList(list);
+            break;
+        }
     }
 
     public void searchByGroup(Scanner input) {
-        EPhoneGroup group = this.getGroupFromScanner(input, "찾을 ");
+        while (true) {
+            EPhoneGroup group = this.getGroupFromScanner(input, "찾을 ");
+            if (group == null) {
+                System.out.println("연락처 그룹을 입력하세요.");
+                continue; // 그룹이 비어 있으면 다시 입력 받기
+            }
 
-        List<IPhoneBook> list = this.phoneBookService.getListFromGroup(group);
-        this.printList(list);
+            List<IPhoneBook> list = this.phoneBookService.getListFromGroup(group);
+            if (list.isEmpty()) {
+                System.out.println("저장된 연락처 그룹이 없습니다.");
+                return; // 저장된 값이 없는 경우
+            }
+            this.printList(list);
+            break;
+        }
     }
 
     public void searchByPhone(Scanner input) {
-        System.out.print("찾을 번호 :");
-        String findPhone = input.nextLine();
+        while (true) {
+            System.out.print("찾을 번호 :");
+            String findPhone = input.nextLine();
+            if (findPhone.isEmpty()) {
+                System.out.println("번호를 입력하세요");
+                continue; // 번호가 비어 있으면 다시 입력 받기
+            }
 
-        List<IPhoneBook> list = this.phoneBookService.getListFromPhoneNumber(findPhone);
-        this.printList(list);
+            List<IPhoneBook> list = this.phoneBookService.getListFromPhoneNumber(findPhone);
+            if (list.isEmpty()) {
+                System.out.println("저장된 전화번호가 없습니다.");
+                return; // 저장된 값이 없는 경우
+            }
+            this.printList(list);
+            break;
+        }
     }
 
     public void searchByEmail(Scanner input) {
-        System.out.print("찾을 Email :");
-        String findEmail = input.nextLine();
+        while (true) {
+            System.out.print("찾을 Email :");
+            String findEmail = input.nextLine();
+            if (findEmail.isEmpty()) {
+                System.out.println("이메일을 입력하세요");
+                continue; // 이메일이 비어 있으면 다시 입력 받기
+            }
 
-        List<IPhoneBook> list = this.phoneBookService.getListFromEmail(findEmail);
-        this.printList(list);
+            List<IPhoneBook> list = this.phoneBookService.getListFromEmail(findEmail);
+            if (list.isEmpty()) {
+                System.out.println("저장된 이메일이 없습니다.");
+                return; // 저장된 값이 없는 경우
+            }
+            this.printList(list);
+            break;
+        }
     }
 }
